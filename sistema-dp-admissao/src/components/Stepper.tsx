@@ -1,6 +1,6 @@
 import { AlertCircle, Check } from "lucide-react";
 import { useAdmission } from "../state/AdmissionContext";
-import { STEPS } from "../lib/validation";
+import { STEPS, requiredDocsMissing } from "../lib/validation";
 import { cn } from "../lib/cn";
 
 type StepState = "concluida" | "atual" | "pendente" | "nao_iniciada";
@@ -10,7 +10,8 @@ export function Stepper() {
 
   const stepState = (i: number): StepState => {
     const s = STEPS[i];
-    const hasErrors = Object.keys(errorsByStep[s.id]).length > 0;
+    const hasErrors =
+      Object.keys(errorsByStep[s.id]).length > 0 || (s.id === "documentos" && requiredDocsMissing(state.data));
     if (i === state.currentStep) return "atual";
     if (s.id === "conferencia") return state.finishedAt ? "concluida" : "nao_iniciada";
     if (state.confirmedSteps.includes(s.id)) return hasErrors ? "pendente" : "concluida";
@@ -18,7 +19,7 @@ export function Stepper() {
   };
 
   return (
-    <nav aria-label="Etapas da admissão" className="-mx-1 overflow-x-auto px-1 pb-1">
+    <nav aria-label="Etapas da admissão" className="relative -mx-1 overflow-x-auto px-1 pb-1">
       <ol className="flex min-w-max gap-2 lg:grid lg:min-w-0 lg:grid-cols-6">
         {STEPS.map((s, i) => {
           const st = stepState(i);
@@ -29,7 +30,7 @@ export function Stepper() {
                 onClick={() => goTo(i)}
                 aria-current={st === "atual" ? "step" : undefined}
                 className={cn(
-                  "flex w-full min-w-[150px] items-center gap-2.5 rounded-lg border px-3 py-2.5 text-left transition lg:min-w-0",
+                  "relative flex w-full min-w-[150px] items-center gap-2.5 rounded-lg border px-3 py-2.5 text-left transition lg:min-w-0",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400",
                   st === "atual" && "border-navy-700 bg-navy-800 text-white shadow-sm",
                   st === "concluida" && "border-emerald-200 bg-white hover:border-emerald-300",

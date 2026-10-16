@@ -21,6 +21,17 @@ export function saveDraft(state: AdmissionState) {
   }
 }
 
+export function storageAvailable() {
+  try {
+    const probe = `${KEY}:teste`;
+    sessionStorage.setItem(probe, "1");
+    sessionStorage.removeItem(probe);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function clearDraft() {
   try {
     sessionStorage.removeItem(KEY);

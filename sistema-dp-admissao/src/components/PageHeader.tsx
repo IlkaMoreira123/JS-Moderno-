@@ -1,6 +1,6 @@
 import { ArrowLeft, Save } from "lucide-react";
 import { useAdmission } from "../state/AdmissionContext";
-import { STEPS } from "../lib/validation";
+import { STEPS, requiredDocsMissing } from "../lib/validation";
 import { formatDateTimeBR } from "../lib/masks";
 import { StatusBadge } from "./ui/StatusBadge";
 import { Button } from "./ui/Button";
@@ -10,7 +10,11 @@ export function PageHeader({ onBack }: { onBack: () => void }) {
 
   // Progresso = etapas confirmadas pelo usuário que estão sem erros
   const done = STEPS.filter(
-    (s) => s.id !== "conferencia" && state.confirmedSteps.includes(s.id) && Object.keys(errorsByStep[s.id]).length === 0,
+    (s) =>
+      s.id !== "conferencia" &&
+      state.confirmedSteps.includes(s.id) &&
+      Object.keys(errorsByStep[s.id]).length === 0 &&
+      !(s.id === "documentos" && requiredDocsMissing(state.data)),
   ).length;
   const conferencia = state.data.checklist.filter((c) => c.checked).length / state.data.checklist.length;
   const percent = Math.round(((done + (state.finishedAt ? 1 : conferencia)) / STEPS.length) * 100);

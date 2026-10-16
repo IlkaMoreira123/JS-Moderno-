@@ -11,7 +11,7 @@ import type {
   StepId,
 } from "../types";
 import { demoAdmission, initialState } from "../data/initial";
-import { clearDraft, loadDraft, saveDraft } from "../lib/storage";
+import { clearDraft, loadDraft, saveDraft, storageAvailable } from "../lib/storage";
 import { deriveStatus, getPendencias, STEPS, validateAll, type Pendencia } from "../lib/validation";
 
 interface AdmissionContextValue {
@@ -60,16 +60,13 @@ export function AdmissionProvider({ children }: { children: ReactNode }) {
   const [lastAutosave, setLastAutosave] = useState<string | null>(null);
   const first = useRef(true);
 
-  // Salvamento automático na sessão a cada alteração (com pequeno atraso)
+  // Salvamento automático na sessão a cada alteração
   useEffect(() => {
     if (first.current) {
       first.current = false;
       return;
     }
-    const t = setTimeout(() => {
-      if (saveDraft(state)) setLastAutosave(new Date().toISOString());
-    }, 400);
-    return () => clearTimeout(t);
+    if (saveDraft(state)) setLastAutosave(new Date().toISOString());
   }, [state]);
 
   const errorsByStep = useMemo(() => validateAll(state.data), [state.data]);
@@ -126,14 +123,15 @@ export function AdmissionProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, confirmedSteps: s.confirmedSteps.filter((x) => x !== step) }));
   }, []);
 
-  const stateRef = useRef(state);
-  stateRef.current = state;
-
   const saveNow = useCallback(() => {
     const savedAt = new Date().toISOString();
-    const next = { ...stateRef.current, savedAt };
-    const ok = saveDraft(next);
-    setState(next);
+    const ok = storageAvailable();
+    // Atualização funcional: não sobrescreve mudanças feitas no mesmo clique
+    setState((s) => {
+      const next = { ...s, savedAt };
+      saveDraft(next);
+      return next;
+    });
     if (ok) setLastAutosave(savedAt);
     return ok;
   }, []);

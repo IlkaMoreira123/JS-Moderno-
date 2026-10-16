@@ -76,7 +76,7 @@ export function ActionBar() {
 
   return (
     <>
-      <div className="sticky bottom-0 z-10 -mx-4 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+      <div className="z-10 -mx-4 mb-0 border-t border-slate-200 bg-white/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6 md:sticky md:bottom-0 md:py-3 lg:-mx-8 lg:px-8">
         <div className="flex flex-col-reverse gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap gap-2">
             {!finished && (
