@@ -2,7 +2,6 @@ import {
   BarChart3,
   Building2,
   CalendarDays,
-  FileSpreadsheet,
   LayoutDashboard,
   Receipt,
   Settings,
